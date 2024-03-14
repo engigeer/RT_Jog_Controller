@@ -1271,11 +1271,11 @@ draw_main_screen(1);
           if (gpio_get(SPINDLEBUTTON)){}//button is still pressed, do nothing
           else{
             if(!jog_toggle_pressed){
-            if(packet->machine_state.mode == 1){ // SAFETY FOR LASERS TO NOT ENABLE LASER FROM JOG2K
-              key_character = CMD_OVERRIDE_FAN0_TOGGLE;
-            }else{
-              key_character = CMD_OVERRIDE_SPINDLE_STOP;
-            }
+              if(packet->machine_state.mode == 1){ // SAFETY FOR LASERS TO NOT ENABLE LASER FROM JOG2K
+                key_character = CMD_OVERRIDE_FAN0_TOGGLE;
+              }else{
+                key_character = CMD_OVERRIDE_SPINDLE_STOP;
+              }
             keypad_sendchar (key_character, 1, 1);
             gpio_put(ONBOARD_LED,1);
             }
@@ -1398,12 +1398,12 @@ draw_main_screen(1);
               key_character = CMD_OVERRIDE_FAN0_TOGGLE;
             }else{
               key_character = SPINON;
+            }
             keypad_sendchar (key_character, 1, 1);
             gpio_put(ONBOARD_LED,1);
             spinon_pressed = 0;
             sleep_ms(10);
             update_neopixels();
-            }
         }}
         if (macro_home_pressed){
           if (gpio_get(HOMEBUTTON)){}//button is still pressed, do nothing
