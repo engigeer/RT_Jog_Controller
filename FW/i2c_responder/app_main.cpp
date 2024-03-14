@@ -537,13 +537,14 @@ static void draw_main_screen(bool force){
           }
         }          
 
-        if(packet->machine_state.mode == 1)
+        if(packet->machine_state.mode == 1){
           oledWriteString(&oled, 0,0,6,(char *)"                 PWR", FONT_6x8, 0, 1);
           sprintf(charbuf, "P:%3d  F:%3d    ", packet->spindle_override, packet->feed_override);
-        else
+        }else{
           oledWriteString(&oled, 0,0,6,(char *)"                 RPM", FONT_6x8, 0, 1);
           sprintf(charbuf, "S:%3d  F:%3d    ", packet->spindle_override, packet->feed_override);
-        
+        }
+
         oledWriteString(&oled, 0,0,BOTTOMLINE,charbuf, FONT_6x8, 0, 1);
         //this is the RPM number
         sprintf(charbuf, "%5d", packet->spindle_rpm);
@@ -581,12 +582,13 @@ static void draw_main_screen(bool force){
             oledWriteString(&oled, 0,0,5,charbuf, FONT_8x8, 0, 1);            
           }         
 
-          if(packet->machine_state.mode == 1)
+          if(packet->machine_state.mode == 1){
             oledWriteString(&oled, 0,0,6,(char *)"                 PWR", FONT_6x8, 0, 1);
             sprintf(charbuf, "P:%3d  F:%3d    ", packet->spindle_override, packet->feed_override);
-          else
+          }else{
             oledWriteString(&oled, 0,0,6,(char *)"                 RPM", FONT_6x8, 0, 1);         
             sprintf(charbuf, "S:%3d  F:%3d    ", packet->spindle_override, packet->feed_override);
+          }
           
           oledWriteString(&oled, 0,0,BOTTOMLINE,charbuf, FONT_6x8, 0, 1);
           //this is the RPM number
@@ -616,13 +618,14 @@ static void draw_main_screen(bool force){
             oledWriteString(&oled, 0,0,5,charbuf, FONT_8x8, 0, 1);            
           }           
 
-          if(packet->machine_state.mode == 1)
+          if(packet->machine_state.mode == 1){
             oledWriteString(&oled, 0,0,6,(char *)"                 PWR", FONT_6x8, 0, 1);
             sprintf(charbuf, "P:%3d  F:%3d    ", packet->spindle_override, packet->feed_override);
-          else
+          }else{
             oledWriteString(&oled, 0,0,6,(char *)"                 RPM", FONT_6x8, 0, 1);           
             sprintf(charbuf, "S:%3d  F:%3d    ", packet->spindle_override, packet->feed_override);
-
+          }
+          
           oledWriteString(&oled, 0,0,BOTTOMLINE,charbuf, FONT_6x8, 0, 1);
           //this is the RPM number
           sprintf(charbuf, "%5d", packet->spindle_rpm);
@@ -1268,7 +1271,11 @@ draw_main_screen(1);
           if (gpio_get(SPINDLEBUTTON)){}//button is still pressed, do nothing
           else{
             if(!jog_toggle_pressed){
-            key_character = CMD_OVERRIDE_SPINDLE_STOP;
+            if(packet->machine_state.mode == 1){ // SAFETY FOR LASERS TO NOT ENABLE LASER FROM JOG2K
+              key_character = CMD_OVERRIDE_FAN0_TOGGLE;
+            }else{
+              key_character = CMD_OVERRIDE_SPINDLE_STOP;
+            }
             keypad_sendchar (key_character, 1, 1);
             gpio_put(ONBOARD_LED,1);
             }
@@ -1387,15 +1394,16 @@ draw_main_screen(1);
         if (spinon_pressed){
           if (gpio_get(SPINDLEBUTTON)){}//button is still pressed, do nothing
           else{
-            if(packet->machine_state.mode == 1) // SAFETY FOR LASERS TO NOT ENABLE LASER FROM JOG2K
-              key_character = CMD_OVERRIDE_FAN0_TOGGLE
-            else
+            if(packet->machine_state.mode == 1){ // SAFETY FOR LASERS TO NOT ENABLE LASER FROM JOG2K
+              key_character = CMD_OVERRIDE_FAN0_TOGGLE;
+            }else{
               key_character = SPINON;
             keypad_sendchar (key_character, 1, 1);
             gpio_put(ONBOARD_LED,1);
             spinon_pressed = 0;
             sleep_ms(10);
             update_neopixels();
+            }
         }}
         if (macro_home_pressed){
           if (gpio_get(HOMEBUTTON)){}//button is still pressed, do nothing
