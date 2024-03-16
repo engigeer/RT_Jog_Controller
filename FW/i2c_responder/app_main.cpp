@@ -1395,7 +1395,7 @@ draw_main_screen(1);
           if (gpio_get(SPINDLEBUTTON)){}//button is still pressed, do nothing
           else{
             if(packet->machine_state.mode == 1){ // SAFETY FOR LASERS TO NOT ENABLE LASER FROM JOG2K
-              key_character = CMD_OVERRIDE_FAN0_TOGGLE;
+              key_character = SPINON; // OKAY TO LEAVE AS SPINDLE MACRO WITH LATEST CODE VERSION DISABLING DEFAULT BEHAVIOUR S200M03
             }else{
               key_character = SPINON;
             }
