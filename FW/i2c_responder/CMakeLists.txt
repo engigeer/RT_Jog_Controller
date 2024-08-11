@@ -24,7 +24,7 @@ pico_enable_stdio_uart(app_main 1)
 pico_add_extra_outputs(app_main)
 # Pull in pico libraries that we need
 # target_link_libraries(pico_neopixel INTERFACE pico_stdlib hardware_pio pico_malloc pico_mem_ops)
-target_link_libraries(app_main hardware_flash i2c_slave pico_stdlib hardware_i2c pico_stdlib hardware_pio pico_malloc pico_mem_ops)
+target_link_libraries(app_main i2c_slave pico_stdlib hardware_i2c pico_stdlib hardware_pio pico_malloc pico_mem_ops)
 #target_include_directories(${CMAKE_CURRENT_LIST_DIR}/include)
 
 
