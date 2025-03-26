@@ -1091,11 +1091,11 @@ draw_main_screen(1);
               keypad_sendchar (key_character, 0, 1);
               break;*/
               case JOG_AL :
-              key_character = MACROLOWER;
+              key_character = CHAR_AL;
               keypad_sendchar (key_character, 0, 1);
               break;   
               case JOG_AR :
-              key_character = MACRORAISE;
+              key_character = CHAR_AR;
               keypad_sendchar (key_character, 0, 1);
               break;                                                                                                                                                                                     
               default:
@@ -1274,12 +1274,7 @@ draw_main_screen(1);
         if (spinoff_pressed) {
           if (gpio_get(SPINDLEBUTTON)){}//button is still pressed, do nothing
           else{
-            if(!jog_toggle_pressed){
-              if(packet->machine_state.mode == 1){ // SAFETY FOR LASERS TO NOT ENABLE LASER FROM JOG2K
-                key_character = CMD_OVERRIDE_FAN0_TOGGLE;
-              }else{
-                key_character = CMD_OVERRIDE_SPINDLE_STOP;
-              }
+            key_character = MACROLOWER;
             keypad_sendchar (key_character, 1, 1);
             gpio_put(ONBOARD_LED,1);
             }
@@ -1424,7 +1419,7 @@ draw_main_screen(1);
         if (spinon_pressed){
           if (gpio_get(SPINDLEBUTTON)){}//button is still pressed, do nothing
           else{
-            key_character = SPINON;
+            key_character = MACRORAISE;
             keypad_sendchar (key_character, 1, 1);
             gpio_put(ONBOARD_LED,1);
             spinon_pressed = 0;
