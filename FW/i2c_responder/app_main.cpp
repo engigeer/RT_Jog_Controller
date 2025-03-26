@@ -1079,11 +1079,11 @@ draw_main_screen(1);
               keypad_sendchar (key_character, 0, 1);
               break;*/
               case JOG_AL :
-              key_character = MACRO_LOWER;
+              key_character = MACROLOWER;
               keypad_sendchar (key_character, 0, 1);
               break;   
               case JOG_AR :
-              key_character = MACRO_RAISE;
+              key_character = MACRORAISE;
               keypad_sendchar (key_character, 0, 1);
               break;                                                                                                                                                                                     
               default:
@@ -1349,7 +1349,7 @@ draw_main_screen(1);
             }
           }//button is still pressed, Jog A Axis//button is still pressed, Jog A axis
           else{
-              if(packet->coordinate.a != 0xFFFFFFFF){          
+              if(packet->a_coordinate != 0xFFFFFFFF){          
                 //gpio_put(KPSTR_PIN, false);
                 jog_toggle_pressed = 0;
                 joggle_reset = true;
@@ -1379,7 +1379,7 @@ draw_main_screen(1);
             }
           }//button is still pressed, Jog A Axis//button is still pressed, Jog A axis
           else{
-              if(packet->coordinate.a != 0xFFFFFFFF){        
+              if(packet->a_coordinate != 0xFFFFFFFF){        
                 //gpio_put(KPSTR_PIN, false);
                 jog_toggle_pressed = 0;
                 joggle_reset = true;
