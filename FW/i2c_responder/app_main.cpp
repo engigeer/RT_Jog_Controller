@@ -1274,7 +1274,8 @@ draw_main_screen(1);
         if (spinoff_pressed) {
           if (gpio_get(SPINDLEBUTTON)){}//button is still pressed, do nothing
           else{
-            key_character = MACROLOWER;
+            if(!jog_toggle_pressed){
+            key_character = MACRORAISE;
             keypad_sendchar (key_character, 1, 1);
             gpio_put(ONBOARD_LED,1);
             }
@@ -1419,7 +1420,7 @@ draw_main_screen(1);
         if (spinon_pressed){
           if (gpio_get(SPINDLEBUTTON)){}//button is still pressed, do nothing
           else{
-            key_character = MACRORAISE;
+            key_character = MACROLOWER;
             keypad_sendchar (key_character, 1, 1);
             gpio_put(ONBOARD_LED,1);
             spinon_pressed = 0;
