@@ -1,3 +1,19 @@
+# == DO NOT EDIT THE FOLLOWING LINES for the Raspberry Pi Pico VS Code Extension to work ==
+if(WIN32)
+    set(USERHOME $ENV{USERPROFILE})
+else()
+    set(USERHOME $ENV{HOME})
+endif()
+set(sdkVersion 2.1.1)
+set(toolchainVersion 14_2_Rel1)
+set(picotoolVersion 2.1.1)
+set(picoVscode ${USERHOME}/.pico-sdk/cmake/pico-vscode.cmake)
+if (EXISTS ${picoVscode})
+    include(${picoVscode})
+endif()
+# ====================================================================================
+set(PICO_BOARD pico CACHE STRING "Board type")
+
 #SET(GCC_COVERAGE_COMPILE_FLAGS "-L")
 add_library(pico_neopixel INTERFACE)
 
@@ -12,12 +28,7 @@ add_subdirectory(i2c_slave)
 add_executable(app_main
 BitBang_I2C.cpp
 BitBang_I2C.h
-ss_oled.cpp
-ss_oled.h
-Adafruit_NeoPixel.cpp
-Adafruit_NeoPixel.hpp
 app_main.cpp)
-pico_generate_pio_header(app_main  ${CMAKE_CURRENT_LIST_DIR}/ws2812byte.pio)
 #target_sources(i2c_slave PRIVATE)
 pico_enable_stdio_usb(app_main 1)
 pico_enable_stdio_uart(app_main 1)
