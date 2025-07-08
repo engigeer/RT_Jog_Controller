@@ -233,7 +233,7 @@ uint8_t keypad_sendchar (uint8_t character, bool clearpin, bool update_status) {
 
 static void update_neopixels(void){
 
-  if (context.mem_address < offsetof(machine_status_packet_t, msgtype))
+  if (context.mem_address_written || (packet->status_code == Status_UserException))// < offsetof(machine_status_packet_t, msgtype))
     return;
   
   //set override LEDS
