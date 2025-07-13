@@ -1,8 +1,8 @@
 #ifndef __I2C_JOGGER_H__
 #define __I2C_JOGGER_H__
 
-#define PLUGIN_VERSION "PLUGIN: Keypad v1.41"
-#define JOG2K_VERSION  "FW: v1.1.0"
+#define PLUGIN_VERSION "PLUGIN: Keypad v1.43"
+#define JOG2K_VERSION  "FW: v1.1.1"
 
 // Which pin on the Arduino is connected to the NeoPixels?
 #define PIN        22 // On Trinket or Gemma, suggest changing this to 1
@@ -274,17 +274,20 @@ enum msg_type_t {
     MachineMsg_ClearMessage = 255,
 };
 
-enum machine_state_t {
-    MachineState_Alarm = 1,
-    MachineState_Cycle = 2,
-    MachineState_Hold = 3,
-    MachineState_ToolChange = 4,
-    MachineState_Idle = 5,
-    MachineState_Homing = 6,
-    MachineState_Jog = 7,
-    // MachineState_Reset = 8,
-    MachineState_Other = 254
-};
+typedef enum {
+    SystemState_Idle = 0,
+    SystemState_Alarm = 1,
+    SystemState_CheckMode = 2,
+    SystemState_Homing = 3,
+    SystemState_Cycle = 4,
+    SystemState_Hold = 5,
+    SystemState_Jog = 6,
+    SystemState_DoorOpen = 7,
+    SystemState_Sleep = 8,
+    SystemState_EStop = 9,
+    SystemState_ToolChange = 10,
+    SystemState_Undefined = 255
+} system_state_t; //__attribute__ ((__packed__)) 
 
 typedef union {
     uint8_t mask;
@@ -472,9 +475,9 @@ typedef enum {
 } __attribute__ ((__packed__)) status_code_t;
 
 typedef struct {
-    uint8_t address;
-    machine_state_t machine_state;
-    uint8_t machine_substate;
+    uint8_t version;
+    system_state_t system_state;
+    uint8_t system_substate;
     axes_signals_t home_state;
     uint8_t feed_override; // size changed in latest version!
     uint8_t spindle_override;

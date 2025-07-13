@@ -90,6 +90,7 @@ int command_error = 0;
 static struct
 {
     uint8_t mem[256];
+    uint8_t version;
     uint8_t mem_address;
     bool mem_address_written;
 } context;
@@ -157,8 +158,8 @@ static void i2c_slave_handler(i2c_inst_t *i2c, i2c_slave_event_t event) {
     case I2C_SLAVE_RECEIVE: // master has written some data
         if (!context.mem_address_written) {
             // writes always start with the memory address
-            context.mem_address = i2c_read_byte(i2c);
-            //context.mem_address = 0x01;
+            context.version = i2c_read_byte(i2c); // read struct version TODO: error checking on version
+            context.mem_address = 0x01; // set address to 1
             context.mem_address_written = true;
         } else {
             // save into memory
@@ -300,15 +301,15 @@ static void update_neopixels(void){
   break;      
   }//close jogmode
 
-  switch (packet->machine_state){
-    case MachineState_Idle :
+  switch (packet->system_state){
+    case SystemState_Idle :
     //no change to jog colors
       run_color[0] = 0; run_color[1] = 255; run_color[2] = 0; //RGB
       hold_color[0] = 255; hold_color[1] = 150; hold_color[2] = 0; //RGB
       halt_color[0] = 255; halt_color[1] = 0; halt_color[2] = 0; //RGB   
     break; //close idle case
 
-    case MachineState_Hold :
+    case SystemState_Hold :
     //no jog during hold to jog colors
       run_color[0] = 0; run_color[1] = 255; run_color[2] = 0; //RGB
       hold_color[0] = 255; hold_color[1] = 150; hold_color[2] = 0; //RGB
@@ -316,14 +317,14 @@ static void update_neopixels(void){
       jog_color[0] = 0; jog_color[1] = 0; jog_color[2] = 0; //RGB     
     break; //close idle case
 
-    case MachineState_ToolChange : 
+    case SystemState_ToolChange : 
     //no change to jog colors
       run_color[0] = 0; run_color[1] = 255; run_color[2] = 0; //RGB
       hold_color[0] = 255; hold_color[1] = 150; hold_color[2] = 0; //RGB
       halt_color[0] = 255; halt_color[1] = 0; halt_color[2] = 0; //RGB   
     break;//close tool change case 
 
-    case MachineState_Jog :
+    case SystemState_Jog :
         //Indicate jog in progress
       run_color[0] = 0; run_color[1] = 255; run_color[2] = 0; //RGB
       hold_color[0] = 255; hold_color[1] = 150; hold_color[2] = 0; //RGB
@@ -331,7 +332,7 @@ static void update_neopixels(void){
       jog_color[0] = 255; jog_color[1] = 150; jog_color[2] = 0; //RGB
     break;//close jog case
 
-    case MachineState_Homing :
+    case SystemState_Homing :
         //No jogging during homing
       run_color[0] = 0; run_color[1] = 255; run_color[2] = 0; //RGB
       hold_color[0] = 255; hold_color[1] = 150; hold_color[2] = 0; //RGB
@@ -339,16 +340,15 @@ static void update_neopixels(void){
       jog_color[0] = 0; jog_color[1] = 0; jog_color[2] = 0; //RGB    
     break;//close homing case
 
-    case MachineState_Cycle :
+    case SystemState_Cycle :
       //No jogging during job
       run_color[0] = 0; run_color[1] = 255; run_color[2] = 0; //RGB
       hold_color[0] = 255; hold_color[1] = 150; hold_color[2] = 0; //RGB
       halt_color[0] = 255; halt_color[1] = 0; halt_color[2] = 0; //RGB        
       jog_color[0] = 0; jog_color[1] = 0; jog_color[2] = 0; //RGB     
-
     break;//close cycle state
 
-    case MachineState_Alarm :
+    case SystemState_Alarm :
           //handle alarm state at bottom
       jog_color[0] = 0; jog_color[1] = 0; jog_color[2] = 0; //RGB
       //run_color[0] = 255; run_color[1] = 0; run_color[2] = 0; //RGB
@@ -369,7 +369,7 @@ static void update_neopixels(void){
       //halt_color[0] = 255; halt_color[1] = 0; halt_color[2] = 0; //RGB   
 
     break;//close alarm state
-  }//close machine_state switch statement
+  }//close system_state switch statement
 
   if(screenmode == JOG_MODIFY){
     //some overrides for alternate functions
@@ -468,9 +468,9 @@ static void draw_main_screen(bool force){
       /*if(packet->machine_state != previous_packet->machine_state)
         oledFill(&oled, 0,1);//clear screen on state change*/
 
-      switch (packet->machine_state){
-        case MachineState_Jog : //jogging is allowed       
-        case MachineState_Idle : //jogging is allowed
+      switch (packet->system_state){
+        case SystemState_Jog : //jogging is allowed       
+        case SystemState_Idle : //jogging is allowed
         if (packet->jog_mode.value!=previous_packet->jog_mode.value || packet->jog_stepsize!=previous_packet->jog_stepsize || force){
           sprintf(charbuf, "        : %3.3f ", packet->jog_stepsize);
           oledWriteString(&oled, 0,0,INFOLINE,charbuf, INFOFONT, 0, 1);
@@ -495,14 +495,14 @@ static void draw_main_screen(bool force){
         }
 
         oledWriteString(&oled, 0,94,4,(char *)" ", FONT_6x8, 0, 1);
-        switch (packet->machine_state){
-          case MachineState_Idle :
+        switch (packet->system_state){
+          case SystemState_Idle :
           oledWriteString(&oled, 0,-1,-1,(char *)"IDLE", FONT_6x8, 0, 1); 
           break;
-          case MachineState_Jog :
+          case SystemState_Jog :
           oledWriteString(&oled, 0,-1,-1,(char *)"JOG ", FONT_6x8, 0, 1);
           break;
-          case MachineState_ToolChange :
+          case SystemState_ToolChange :
           oledWriteString(&oled, 0,-1,-1,(char *)"TOOL", FONT_6x8, 0, 1); 
           break;                   
         }
@@ -553,7 +553,7 @@ static void draw_main_screen(bool force){
         oledWriteString(&oled, 0,-1,-1,charbuf, FONT_6x8, 0, 1);            
         break;//close idle state
 
-        case MachineState_Cycle :
+        case SystemState_Cycle :
           //can still adjust overrides during hold
           //no jog during hold, show feed rate.
           sprintf(charbuf, "        : %3.3f ", packet->feed_rate);
@@ -596,7 +596,7 @@ static void draw_main_screen(bool force){
           oledWriteString(&oled, 0,-1,-1,charbuf, FONT_6x8, 0, 1);    
         break; //close cycle case        
 
-        case MachineState_Hold :
+        case SystemState_Hold :
           //can still adjust overrides during hold
           //no jog during hold
           oledWriteString(&oled, 0,0,INFOLINE,(char *)"    HOLDING     ", JOGFONT, 0, 1);
@@ -630,7 +630,7 @@ static void draw_main_screen(bool force){
           oledWriteString(&oled, 0,-1,-1,charbuf, FONT_6x8, 0, 1);                
         break; //close hold case
 
-        case MachineState_ToolChange :
+        case SystemState_ToolChange :
           //dream feature is to put tool info/comment/number on screen during tool change.
           //cannot adjust overrides during tool change
           //jogging allowed during tool change
@@ -666,9 +666,9 @@ static void draw_main_screen(bool force){
           oledWriteString(&oled, 0,0,BOTTOMLINE,(char *)" TOOL CHANGE", INFOFONT, 0, 1);
         break; //close tool case
 
-        case MachineState_Homing :
+        case SystemState_Homing :
           //no overrides during homing
-          if( (prev_packet.machine_state != packet->machine_state) )
+          if( (prev_packet.system_state != packet->system_state) )
           oledFill(&oled, 0,1);
           oledWriteString(&oled, 0,0,0,(char *)" *****************", FONT_6x8, 0, 1);
           oledWriteString(&oled, 0,0,7,(char *)" *****************", FONT_6x8, 0, 1);
@@ -676,15 +676,15 @@ static void draw_main_screen(bool force){
           oledWriteString(&oled, 0,0,4,(char *)"HOMING", JOGFONT, 0, 1);
         break; //close home case
 
-        case MachineState_Alarm : 
+        case SystemState_Alarm : 
           //only re-fill the screen if the state or alarm code have changed.
-          if( (prev_packet.machine_substate != packet->machine_substate) || (prev_packet.machine_state != packet->machine_state) )
+          if( (prev_packet.system_substate != packet->system_substate) || (prev_packet.system_state != packet->system_state) )
             oledFill(&oled, 0,1);
           oledWriteString(&oled, 0,0,0,(char *)" *****************", FONT_6x8, 0, 1);
           oledWriteString(&oled, 0,0,7,(char *)" *****************", FONT_6x8, 0, 1);
           //no jog during hold
           oledWriteString(&oled, 0,0,3,(char *)"ALARM", JOGFONT, 0, 1);
-          sprintf(charbuf, "Code: %d ", packet->machine_substate);
+          sprintf(charbuf, "Code: %d ", packet->system_substate);
           oledWriteString(&oled, 0,0,4,charbuf, INFOFONT, 0, 1);        
         break; //close alarm case
  
@@ -707,7 +707,7 @@ static void draw_main_screen(bool force){
             oledFill(&oled, 0,1);
           }
         break; //close default case
-      }//close machine_state switch statement
+      }//close system_state switch statement
   }//close screen mode switch statement
   prev_packet = *packet;
   // previous_jogmode = current_jogmode;
@@ -877,6 +877,7 @@ int main() {
 
 // Setup I2C0 as slave (peripheral)
 setup_slave();
+packet->system_state = SystemState_Undefined; // ADD STATUS FOR CONTROLLER DISCONNECTED?
 packet->status_code = Status_UserException; // ADD STATUS FOR CONTROLLER DISCONNECTED?
 key_character = CMD_STATUS_REPORT_LEGACY;
 //keypad_sendchar (key_character, 1, 1);
@@ -910,7 +911,7 @@ draw_main_screen(1);
         //   current_jogmodify =  (Jogmodify) (packet->jog_mode.modifier);
         // }
 
-        if( packet->machine_state != previous_packet->machine_state ||
+        if( packet->system_state != previous_packet->system_state ||
             packet->feed_override != previous_packet->feed_override ||
             packet->spindle_override != previous_packet->spindle_override||
             packet->jog_mode.value != previous_packet->jog_mode.value ||
@@ -931,13 +932,13 @@ draw_main_screen(1);
         //if(screenmode != previous_screenmode)
         //  draw_main_screen(1);
         
-        if(packet->machine_state == MachineState_Jog){
+        if(packet->system_state == SystemState_Jog){
           draw_main_screen(1);
           update_neopixels();
         }
 
         if (update_neopixel_leds && (packet->status_code != Status_UserException) ){
-          if(context.mem_address >= offsetof(machine_status_packet_t, msgtype))          
+          if(!context.mem_address_written) // >= offsetof(machine_status_packet_t, msgtype))          
             update_neopixels();
           update_neopixel_leds = 0;
         }
@@ -953,9 +954,9 @@ draw_main_screen(1);
           if(!jog_toggle_pressed){             
           key_character = CMD_FEED_HOLD ;
           keypad_sendchar(key_character, 1, 1);
-          }
           while(gpio_get(HOLDBUTTON))
             sleep_us(100);
+          } 
           //gpio_put(KPSTR_PIN, false);
                                 
         } else if (gpio_get(RUNBUTTON)){
@@ -963,9 +964,9 @@ draw_main_screen(1);
           if(!jog_toggle_pressed){             
           key_character = CMD_CYCLE_START ;
           keypad_sendchar(key_character, 1, 1);
-          }
           while(gpio_get(RUNBUTTON))
             sleep_us(100);
+          }
           //gpio_put(KPSTR_PIN, false);    
         //misc commands.  These activate on lift
         } else if (gpio_get(SPINOVER_UP)){  
@@ -1450,7 +1451,7 @@ draw_main_screen(1);
             gpio_put(ONBOARD_LED,1);
             reset_pressed = 0;
             sleep_ms(10);
-            packet->machine_state = MachineState_Other;
+            packet->system_state = SystemState_Undefined;
             packet->status_code = Status_Reset;
             draw_main_screen(1);
             sleep_ms(500);            
