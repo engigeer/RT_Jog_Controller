@@ -159,7 +159,12 @@ static void i2c_slave_handler(i2c_inst_t *i2c, i2c_slave_event_t event) {
         if (!context.mem_address_written) {
             // writes always start with the memory address
             context.version = i2c_read_byte(i2c); // read struct version TODO: error checking on version
-            context.mem_address = 0x01; // set address to 1
+            if (context.version == 0x02)
+              context.mem_address = 0x01; // set address to 1
+            else{ // temporary fix . . . 
+              context.mem[context.mem_address] = context.version;
+              context.mem_address++;
+            }
             context.mem_address_written = true;
         } else {
             // save into memory
@@ -918,7 +923,7 @@ draw_main_screen(1);
             packet->coordinate.x != previous_packet->coordinate.x ||
             packet->coordinate.y != previous_packet->coordinate.y ||
             packet->coordinate.z != previous_packet->coordinate.z ||
-            packet->coordinate.a != previous_packet->coordinate.a ||                  
+            (!isnan(packet->coordinate.a) && (packet->coordinate.a != previous_packet->coordinate.a)) ||       // temp fix for NAN           
             packet->current_wcs != previous_packet->current_wcs ||
             packet->jog_stepsize != previous_packet->jog_stepsize ||
             packet->feed_rate != previous_packet->feed_rate ||
@@ -1023,7 +1028,7 @@ draw_main_screen(1);
             gpio_put(KPSTR_PIN, false); //make sure stobe is clear when no button is pressed.
           if (status_update_counter < 1){
             status_update_counter = STATUS_REQUEST_PERIOD;
-            draw_main_screen(1);
+            draw_main_screen(0);
             update_neopixels();
           }
         }        
