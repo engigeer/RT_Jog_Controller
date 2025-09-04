@@ -1281,7 +1281,7 @@ draw_main_screen(1);
           if (gpio_get(SPINDLEBUTTON)){}//button is still pressed, do nothing
           else{
             if(!jog_toggle_pressed){
-            key_character = SPINOFF;
+            key_character = CMD_OVERRIDE_LASER_TOGGLE;
             keypad_sendchar (key_character, 1, 1);
             gpio_put(ONBOARD_LED,1);
             }
