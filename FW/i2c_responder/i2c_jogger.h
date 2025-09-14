@@ -95,14 +95,13 @@ const uint8_t *flash_target_contents = (const uint8_t *) (XIP_BASE + FLASH_TARGE
 #define STATUS_REQUEST_PERIOD 100
 
 //ACTION DEFINES
-#define MACROUP     0xB0 //MACRO_KEY0
-#define MACRODOWN   0xB1 //MACRO_KEY1
-#define MACROLEFT   0xB2 //MACRO_KEY2
-#define MACRORIGHT  0xB3 //MACRO_KEY3
-#define SPINOFF     0xB4 //MACRO_KEY4
-#define SPINON      0xB5 //MACRO_KEY5
-#define MACRORAISE  0xB6 //MACRO_KEY6
-#define MACROLOWER  0xB7 //MACRO_KEY7
+#define MACROUP         0xB0 //MACRO_KEY0
+#define MACRODOWN       0xB1 //MACRO_KEY1
+#define MACROLEFT       0xB2 //MACRO_KEY2
+#define MACRORIGHT      0xB3 //MACRO_KEY3
+#define MACROSPINDLE    0xB4 //MACRO_KEY4
+#define MACRORAISE      0xB5 //MACRO_KEY5
+#define MACROLOWER      0xB6 //MACRO_KEY6
 
 #define MACROHOME   'o'  //toggle WCS offset
 #define RESET  0x18
@@ -172,7 +171,6 @@ const uint8_t *flash_target_contents = (const uint8_t *) (XIP_BASE + FLASH_TARGE
 #define CMD_OVERRIDE_SPINDLE_FINE_PLUS 0x9C
 #define CMD_OVERRIDE_SPINDLE_FINE_MINUS 0x9D
 #define CMD_OVERRIDE_SPINDLE_STOP 0x9E
-#define CMD_OVERRIDE_LASER_TOGGLE 0x9F
 #define CMD_OVERRIDE_COOLANT_FLOOD_TOGGLE 'C'
 #define CMD_OVERRIDE_COOLANT_MIST_TOGGLE 'M'
 #define CMD_PID_REPORT 0xA2
