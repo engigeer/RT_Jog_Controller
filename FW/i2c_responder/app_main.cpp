@@ -141,6 +141,9 @@ uint8_t reset_pressed = 0;
 uint8_t unlock_pressed = 0;
 uint8_t halt_pressed = 0;
 
+uint8_t powder1select_pressed = 0;
+uint8_t powder2select_pressed = 0;
+
 machine_status_packet_t *packet = (machine_status_packet_t*) context.mem;
 machine_status_packet_t prev_packet;
 machine_status_packet_t *previous_packet = &prev_packet;
@@ -1182,11 +1185,17 @@ draw_main_screen(1);
             screenmode = JOG_MODIFY;
             update_neopixels();
             //draw_main_screen(1);
-            if (gpio_get(FLOODBUTTON)){
+            if (gpio_get(FEEDOVER_RESET)){
               jog_mod_pressed = 1;
             }
-            if (gpio_get(MISTBUTTON)){
+            if (gpio_get(SPINOVER_RESET)){
               jog_mode_pressed = 1;
+            }
+            if (gpio_get(FLOODBUTTON)){
+              powder1select_pressed = 1;
+            }
+            if (gpio_get(MISTBUTTON)){
+              powder2select_pressed = 1;
             }
             if (gpio_get(LEFTBUTTON)){
               macro_left_pressed = 1;
@@ -1267,9 +1276,11 @@ draw_main_screen(1);
         if (feed_reset_pressed) {
           if (gpio_get(FEEDOVER_RESET)){}//button is still pressed, do nothing
           else{
+            if(!jog_toggle_pressed){
             key_character = CMD_OVERRIDE_FEED_RESET;
             keypad_sendchar (key_character, 1, 1);
             gpio_put(ONBOARD_LED,1);
+            }
             feed_reset_pressed = 0;
             update_neopixels();                
           }
@@ -1297,9 +1308,11 @@ draw_main_screen(1);
         if (spin_reset_pressed) {
           if (gpio_get(SPINOVER_RESET)){}//button is still pressed, do nothing
           else{
+            if(!jog_toggle_pressed){
             key_character = CMD_OVERRIDE_SPINDLE_RESET;
             keypad_sendchar (key_character, 1, 1);
             gpio_put(ONBOARD_LED,1);
+            }
             spin_reset_pressed = 0;
             update_neopixels();          
           }
@@ -1308,7 +1321,7 @@ draw_main_screen(1);
           if (gpio_get(MISTBUTTON)){}//button is still pressed, do nothing
           else{
             if(!jog_toggle_pressed){
-            key_character = CMD_OVERRIDE_COOLANT_MIST_TOGGLE;
+            key_character = CMD_OVERRIDE_COOLANT_FLOOD_TOGGLE; // SWAP WITH MIST FOR L3?
             keypad_sendchar (key_character, 1, 1);
             gpio_put(ONBOARD_LED,1);
             }
@@ -1320,7 +1333,7 @@ draw_main_screen(1);
           if (gpio_get(FLOODBUTTON)){}//button is still pressed, do nothing
           else{
             if(!jog_toggle_pressed){
-            key_character = CMD_OVERRIDE_COOLANT_FLOOD_TOGGLE;
+            key_character = CMD_OVERRIDE_COOLANT_MIST_TOGGLE; // SWAP WITH FLOOD FOR L3?
             keypad_sendchar (key_character, 1, 1);
             gpio_put(ONBOARD_LED,1);
             }
@@ -1353,7 +1366,7 @@ draw_main_screen(1);
           }                    
         }
         if (jog_mod_pressed) {
-          if (gpio_get(FLOODBUTTON)){}//button is still pressed, do nothing
+          if (gpio_get(FEEDOVER_RESET)){}//button is still pressed, do nothing
           else{
             key_character = JOGMODIFY_CYCLE;
             keypad_sendchar (key_character, 1, 1);
@@ -1364,13 +1377,36 @@ draw_main_screen(1);
           }
         }
         if (jog_mode_pressed) {
-          if (gpio_get(MISTBUTTON)){}//button is still pressed, do nothing
+          if (gpio_get(SPINOVER_RESET)){}//button is still pressed, do nothing
           else{
             key_character = JOGMODE_CYCLE;     
             keypad_sendchar (key_character, 1, 1);
             //gpio_put(KPSTR_PIN, false);
             gpio_put(ONBOARD_LED,1);
             jog_mode_pressed = 0;
+            sleep_ms(10);
+            update_neopixels();                   
+          }
+        }
+        if (powder1select_pressed) {
+          if (gpio_get(FLOODBUTTON)){}//button is still pressed, do nothing
+          else{
+            key_character = POWDER1SELECT;
+            keypad_sendchar (key_character, 1, 1);
+            gpio_put(ONBOARD_LED,1);
+            powder1select_pressed = 0;
+            sleep_ms(10);
+            update_neopixels();                       
+          }
+        }
+        if (powder2select_pressed) {
+          if (gpio_get(MISTBUTTON)){}//button is still pressed, do nothing
+          else{
+            key_character = POWDER2SELECT;     
+            keypad_sendchar (key_character, 1, 1);
+            //gpio_put(KPSTR_PIN, false);
+            gpio_put(ONBOARD_LED,1);
+            powder2select_pressed = 0;
             sleep_ms(10);
             update_neopixels();                   
           }
