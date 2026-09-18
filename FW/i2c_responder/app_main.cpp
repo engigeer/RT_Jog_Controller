@@ -1468,7 +1468,7 @@ draw_main_screen(1);
           else{
               if(!isnan(packet->coordinate.a)){          
                 //gpio_put(KPSTR_PIN, false);
-                jog_toggle_pressed = 0;
+                //jog_toggle_pressed = 0;
                 joggle_reset = true;
               }
               else{
@@ -1497,7 +1497,7 @@ draw_main_screen(1);
           else{
               if(!isnan(packet->coordinate.a)){        
                 //gpio_put(KPSTR_PIN, false);
-                jog_toggle_pressed = 0;
+                //jog_toggle_pressed = 0;
                 joggle_reset = true;
               }
               else{

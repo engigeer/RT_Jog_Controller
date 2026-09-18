@@ -2,10 +2,10 @@
 #define __I2C_JOGGER_H__
 
 #define PLUGIN_VERSION "PLUGIN: Keypad v1.44"
-#define JOG2K_FW_VERSION "1.2.1"
+#define JOG2K_FW_VERSION "1.2.2"
 
 #ifndef BUILD_SHA
-#define BUILD_SHA "p1"
+#define BUILD_SHA "L11"
 #endif
 
 #define JOG2K_VERSION "v" JOG2K_FW_VERSION "+" BUILD_SHA
